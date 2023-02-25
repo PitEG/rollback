@@ -15,11 +15,19 @@ int main() {
   {
     asio::io_context io;
     udp::socket socket(io, udp::endpoint(udp::v4(),7777));
+    socket.non_blocking(true);
     for(;;)
     {
       char recv_buf[1];
       udp::endpoint remote_endpoint;
-      socket.receive_from(asio::buffer(recv_buf), remote_endpoint);
+      try {
+        socket.receive_from(asio::buffer(recv_buf), remote_endpoint);
+        std::cout << "something" << std::endl;
+      }
+      catch (std::exception& e) {
+        std::cout << "nothing" << std::endl;
+        continue;
+      }
       std::string message = make_daytime_string();
       asio::error_code ignored_error;
       socket.send_to(asio::buffer(message), remote_endpoint, 0, ignored_error);
